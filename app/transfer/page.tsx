@@ -563,7 +563,7 @@ export default function GetGas() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First Button/Form */}
             {!showTransfer && (
-              <div className="bg-neutral-900 rounded-3xl p-8 border border-neutral-800 fade-in h-[180px] flex flex-col">
+              <div className={`bg-neutral-900 rounded-3xl p-8 border border-neutral-800 fade-in h-[180px] flex flex-col ${isVerified ? 'md:col-span-2' : ''}`}>
                 {!isVerified ? (
                   <div className="flex flex-col">
                     <div>
@@ -579,15 +579,24 @@ export default function GetGas() {
                       <div className="flex items-center gap-4">
                         <div className="flex-1">
                           <IDKitWidget
-                            app_id={`app_${process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || ""}` as `app_${string}`}
-                            action="get_gas"
-                            signal={address}
-                            onSuccess={onSuccess}
-                            verification_level={VerificationLevel.Device}
+                            app_id={(process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || "") as `app_${string}`}
+                            action="provehuman"
+                            signal="provehuman"
+                            onSuccess={(result) => {
+                              console.log("WorldID verification result:", result);
+                              onSuccess(result);
+                            }}
+                            verification_level={VerificationLevel.Orb}
                           >
                             {({ open }) => (
                               <button
-                                onClick={open}
+                                onClick={() => {
+                                  console.log("Environment variables:", {
+                                    worldcoinAppId: process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID,
+                                    nodeEnv: process.env.NODE_ENV
+                                  });
+                                  open();
+                                }}
                                 className="w-full bg-[#8A63D2] hover:bg-[#8A63D2]/90 text-white font-medium py-3 px-6 rounded-lg transition-colors"
                               >
                                 Verify with World ID
@@ -605,7 +614,16 @@ export default function GetGas() {
                 ) : (
                   <form onSubmit={handleSubmit} className="flex flex-col">
                     <div>
-                      <h3 className={`text-2xl font-medium ${playfair.className}`}>Enter your EVM address</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <button
+                          type="button"
+                          onClick={() => setIsVerified(false)}
+                          className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
+                        >
+                          ← Back
+                        </button>
+                        <h3 className={`text-2xl font-medium ${playfair.className}`}>Enter your EVM address</h3>
+                      </div>
                       <div className="space-y-4 mt-4">
                         <div>
                           <input
@@ -633,7 +651,7 @@ export default function GetGas() {
             )}
 
             {/* Second Button/Transfer Interface */}
-            <div className={`${showTransfer ? 'col-span-full' : ''}`}>
+            <div className={`${showTransfer ? 'col-span-full' : ''} ${isVerified ? 'hidden' : ''}`}>
               {!showTransfer ? (
                 <div className="bg-neutral-900 rounded-3xl p-8 border border-neutral-800 fade-in h-[180px] flex flex-col">
                   <div className="flex flex-col">
